@@ -139,7 +139,7 @@ const Index = () => {
         {isEditing ? (
           <Button colorScheme="teal" onClick={handleUpdateNote}>Update Note</Button>
         ) : (
-          <Button colorScheme="teal" onClick={handleAddNote}>Add Note</Button>
+          <Button colorScheme="blue" onClick={handleAddNote}>Add Note</Button>
         )}
       </VStack>
       <Grid templateColumns={{ sm: "1fr", md: "1fr 1fr", lg: "1fr 1fr 1fr" }} gap={4}>
