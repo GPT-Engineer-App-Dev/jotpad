@@ -4,6 +4,7 @@ import { FaTrash, FaEdit } from "react-icons/fa";
 
 const Index = () => {
   const [notes, setNotes] = useState([]);
+  const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -11,10 +12,11 @@ const Index = () => {
 
   const handleAddNote = () => {
     if (title && content) {
-      const newNote = { id: Date.now(), title, content };
+      const newNote = { id: Date.now(), title, content, image };
       setNotes([...notes, newNote]);
       setTitle("");
       setContent("");
+      setImage(null);
     }
   };
 
@@ -27,11 +29,12 @@ const Index = () => {
   };
 
   const handleUpdateNote = () => {
-    setNotes(notes.map((note) => (note.id === currentNoteId ? { ...note, title, content } : note)));
+    setNotes(notes.map((note) => (note.id === currentNoteId ? { ...note, title, content, image } : note)));
     setTitle("");
     setContent("");
     setIsEditing(false);
     setCurrentNoteId(null);
+    setImage(null);
   };
 
   const handleDeleteNote = (id) => {
@@ -48,6 +51,11 @@ const Index = () => {
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+        />
+        <Input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(URL.createObjectURL(e.target.files[0]))}
         />
         <Textarea
           placeholder="Content"
@@ -81,6 +89,7 @@ const Index = () => {
               </HStack>
             </HStack>
             <Text>{note.content}</Text>
+            {note.image && <Image src={note.image} alt={note.title} mt={2} />}
           </Box>
         ))}
       </SimpleGrid>
