@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, SimpleGrid, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure, Image } from "@chakra-ui/react";
+import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure, Image, Flex, Grid } from "@chakra-ui/react";
 import { FaTrash, FaEdit, FaMicrophone, FaPlay } from "react-icons/fa";
 
 const Index = () => {
@@ -82,11 +82,11 @@ const Index = () => {
 
   return (
     <Container maxW="container.xl" p={4}>
-      <Box as="nav" bg="blue.500" color="white" p={4} mb={4}>
-        <HStack justifyContent="space-between">
+      <Box as="nav" bg="teal.500" color="white" p={4} mb={4}>
+        <Flex justifyContent="space-between" alignItems="center">
           <Text fontSize="2xl" fontWeight="bold">Note Taking App</Text>
-          <Button colorScheme="blue" onClick={onOpen}>Past Notes</Button>
-        </HStack>
+          <Button colorScheme="teal" onClick={onOpen}>Past Notes</Button>
+        </Flex>
       </Box>
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay>
@@ -132,17 +132,17 @@ const Index = () => {
           {isRecording ? (
             <Button colorScheme="red" onClick={handleStopRecording}>Stop Recording</Button>
           ) : (
-            <Button leftIcon={<FaMicrophone />} colorScheme="blue" onClick={handleStartRecording}>Record Voice Note</Button>
+            <Button leftIcon={<FaMicrophone />} colorScheme="teal" onClick={handleStartRecording}>Record Voice Note</Button>
           )}
           {audioURL && <Button leftIcon={<FaPlay />} onClick={() => new Audio(audioURL).play()}>Play Voice Note</Button>}
         </HStack>
         {isEditing ? (
-          <Button colorScheme="blue" onClick={handleUpdateNote}>Update Note</Button>
+          <Button colorScheme="teal" onClick={handleUpdateNote}>Update Note</Button>
         ) : (
-          <Button colorScheme="blue" onClick={handleAddNote}>Add Note</Button>
+          <Button colorScheme="teal" onClick={handleAddNote}>Add Note</Button>
         )}
       </VStack>
-      <SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} spacing={4}>
+      <Grid templateColumns={{ sm: "1fr", md: "1fr 1fr", lg: "1fr 1fr 1fr" }} gap={4}>
         {notes.map((note) => (
           <Box key={note.id} p={4} borderWidth="1px" borderRadius="md" boxShadow="md">
             <HStack justifyContent="space-between" mb={2}>
@@ -167,7 +167,7 @@ const Index = () => {
             {note.audioURL && <Button leftIcon={<FaPlay />} onClick={() => new Audio(note.audioURL).play()}>Play Voice Note</Button>}
           </Box>
         ))}
-      </SimpleGrid>
+      </Grid>
     </Container>
   );
 };
