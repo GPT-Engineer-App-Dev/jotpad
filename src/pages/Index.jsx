@@ -1,9 +1,11 @@
 import { useState, useRef } from "react";
-import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure, Image, Flex, Grid } from "@chakra-ui/react";
+import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, Image, Flex, Grid, Select } from "@chakra-ui/react";
 import { FaTrash, FaEdit, FaMicrophone, FaPlay } from "react-icons/fa";
 
 const Index = () => {
   const [notes, setNotes] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [image, setImage] = useState(null);
   const [imageURL, setImageURL] = useState("");
   const [title, setTitle] = useState("");
@@ -18,7 +20,7 @@ const Index = () => {
 
   const handleAddNote = () => {
     if (title && content) {
-      const newNote = { id: Date.now(), title, content, image: image || imageURL, audioURL };
+      const newNote = { id: Date.now(), title, content, image: image || imageURL, audioURL, category: selectedCategory };
       setNotes([...notes, newNote]);
       setTitle("");
       setContent("");
@@ -35,12 +37,13 @@ const Index = () => {
     setImage(noteToEdit.image);
     setImageURL(noteToEdit.image);
     setAudioURL(noteToEdit.audioURL);
+    setSelectedCategory(noteToEdit.category);
     setIsEditing(true);
     setCurrentNoteId(id);
   };
 
   const handleUpdateNote = () => {
-    setNotes(notes.map((note) => (note.id === currentNoteId ? { ...note, title, content, image: image || imageURL, audioURL } : note)));
+    setNotes(notes.map((note) => (note.id === currentNoteId ? { ...note, title, content, image: image || imageURL, audioURL, category: selectedCategory } : note)));
     setTitle("");
     setContent("");
     setIsEditing(false);
@@ -77,7 +80,14 @@ const Index = () => {
     setImage(note.image);
     setImageURL(note.image);
     setAudioURL(note.audioURL);
+    setSelectedCategory(note.category);
     onClose();
+  };
+
+  const handleAddCategory = () => {
+    if (selectedCategory && !categories.includes(selectedCategory)) {
+      setCategories([...categories, selectedCategory]);
+    }
   };
 
   return (
@@ -87,6 +97,23 @@ const Index = () => {
           <Text fontSize="2xl" fontWeight="bold">Note Taking App</Text>
           <Button colorScheme="teal" onClick={onOpen}>Past Notes</Button>
         </Flex>
+        <Select
+          mt={4}
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          <option value="All">All</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>{category}</option>
+          ))}
+        </Select>
+        <Input
+          mt={2}
+          placeholder="New Category"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        />
+        <Button mt={2} colorScheme="teal" onClick={handleAddCategory}>Add Category</Button>
       </Box>
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay>
@@ -95,7 +122,7 @@ const Index = () => {
             <DrawerHeader>Past Notes</DrawerHeader>
             <DrawerBody>
               <VStack align="stretch">
-                {notes.map((note) => (
+                {notes.filter((note) => selectedCategory === "All" || note.category === selectedCategory).map((note) => (
                   <Box key={note.id} p={2} borderWidth="1px" borderRadius="md" onClick={() => handleSelectNote(note)} cursor="pointer">
                     <Text fontSize="lg" fontWeight="bold">{note.title}</Text>
                     <Text isTruncated>{note.content}</Text>
@@ -143,7 +170,7 @@ const Index = () => {
         )}
       </VStack>
       <Grid templateColumns={{ sm: "1fr", md: "1fr 1fr", lg: "1fr 1fr 1fr" }} gap={4}>
-        {notes.map((note) => (
+        {notes.filter((note) => selectedCategory === "All" || note.category === selectedCategory).map((note) => (
           <Box key={note.id} p={4} borderWidth="1px" borderRadius="md" boxShadow="md">
             <HStack justifyContent="space-between" mb={2}>
               <Text fontSize="xl" fontWeight="bold">{note.title}</Text>
