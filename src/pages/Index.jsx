@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, SimpleGrid } from "@chakra-ui/react";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { FaTrash, FaEdit, FaMicrophone, FaPlay } from "react-icons/fa";
 
 const Index = () => {
   const [notes, setNotes] = useState([]);
@@ -9,14 +9,18 @@ const Index = () => {
   const [content, setContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [currentNoteId, setCurrentNoteId] = useState(null);
+  const [audioURL, setAudioURL] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
 
   const handleAddNote = () => {
     if (title && content) {
-      const newNote = { id: Date.now(), title, content, image };
+      const newNote = { id: Date.now(), title, content, image, audioURL };
       setNotes([...notes, newNote]);
       setTitle("");
       setContent("");
       setImage(null);
+      setAudioURL(null);
     }
   };
 
@@ -24,21 +28,40 @@ const Index = () => {
     const noteToEdit = notes.find((note) => note.id === id);
     setTitle(noteToEdit.title);
     setContent(noteToEdit.content);
+    setImage(noteToEdit.image);
+    setAudioURL(noteToEdit.audioURL);
     setIsEditing(true);
     setCurrentNoteId(id);
   };
 
   const handleUpdateNote = () => {
-    setNotes(notes.map((note) => (note.id === currentNoteId ? { ...note, title, content, image } : note)));
+    setNotes(notes.map((note) => (note.id === currentNoteId ? { ...note, title, content, image, audioURL } : note)));
     setTitle("");
     setContent("");
     setIsEditing(false);
     setCurrentNoteId(null);
     setImage(null);
+    setAudioURL(null);
   };
 
   const handleDeleteNote = (id) => {
     setNotes(notes.filter((note) => note.id !== id));
+  };
+
+  const handleStartRecording = async () => {
+    setIsRecording(true);
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorderRef.current = new MediaRecorder(stream);
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      const audioBlob = new Blob([event.data], { type: 'audio/wav' });
+      setAudioURL(URL.createObjectURL(audioBlob));
+    };
+    mediaRecorderRef.current.start();
+  };
+
+  const handleStopRecording = () => {
+    setIsRecording(false);
+    mediaRecorderRef.current.stop();
   };
 
   return (
@@ -62,6 +85,14 @@ const Index = () => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
+        <HStack>
+          {isRecording ? (
+            <Button colorScheme="red" onClick={handleStopRecording}>Stop Recording</Button>
+          ) : (
+            <Button leftIcon={<FaMicrophone />} colorScheme="blue" onClick={handleStartRecording}>Record Voice Note</Button>
+          )}
+          {audioURL && <Button leftIcon={<FaPlay />} onClick={() => new Audio(audioURL).play()}>Play Voice Note</Button>}
+        </HStack>
         {isEditing ? (
           <Button colorScheme="blue" onClick={handleUpdateNote}>Update Note</Button>
         ) : (
@@ -90,6 +121,7 @@ const Index = () => {
             </HStack>
             <Text>{note.content}</Text>
             {note.image && <Image src={note.image} alt={note.title} mt={2} />}
+            {note.audioURL && <Button leftIcon={<FaPlay />} onClick={() => new Audio(note.audioURL).play()}>Play Voice Note</Button>}
           </Box>
         ))}
       </SimpleGrid>
