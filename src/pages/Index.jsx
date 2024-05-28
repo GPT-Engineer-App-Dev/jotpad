@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, SimpleGrid } from "@chakra-ui/react";
+import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, SimpleGrid, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure } from "@chakra-ui/react";
 import { FaTrash, FaEdit, FaMicrophone, FaPlay } from "react-icons/fa";
 
 const Index = () => {
@@ -9,6 +9,8 @@ const Index = () => {
   const [content, setContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [currentNoteId, setCurrentNoteId] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedNote, setSelectedNote] = useState(null);
   const [audioURL, setAudioURL] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
@@ -64,11 +66,42 @@ const Index = () => {
     mediaRecorderRef.current.stop();
   };
 
+  const handleSelectNote = (note) => {
+    setSelectedNote(note);
+    setTitle(note.title);
+    setContent(note.content);
+    setImage(note.image);
+    setAudioURL(note.audioURL);
+    onClose();
+  };
+
   return (
     <Container maxW="container.xl" p={4}>
       <Box as="nav" bg="blue.500" color="white" p={4} mb={4}>
-        <Text fontSize="2xl" fontWeight="bold">Note Taking App</Text>
+        <HStack justifyContent="space-between">
+          <Text fontSize="2xl" fontWeight="bold">Note Taking App</Text>
+          <Button colorScheme="blue" onClick={onOpen}>Past Notes</Button>
+        </HStack>
       </Box>
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
+        <DrawerOverlay>
+          <DrawerContent>
+            <DrawerCloseButton />
+            <DrawerHeader>Past Notes</DrawerHeader>
+            <DrawerBody>
+              <VStack align="stretch">
+                {notes.map((note) => (
+                  <Box key={note.id} p={2} borderWidth="1px" borderRadius="md" onClick={() => handleSelectNote(note)} cursor="pointer">
+                    <Text fontSize="lg" fontWeight="bold">{note.title}</Text>
+                    <Text isTruncated>{note.content}</Text>
+                  </Box>
+                ))}
+              </VStack>
+            </DrawerBody>
+          </DrawerContent>
+        </DrawerOverlay>
+      </Drawer>
+      
       <VStack spacing={4} mb={4}>
         <Input
           placeholder="Title"
