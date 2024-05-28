@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
-import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, SimpleGrid, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure } from "@chakra-ui/react";
+import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, SimpleGrid, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure, Image } from "@chakra-ui/react";
 import { FaTrash, FaEdit, FaMicrophone, FaPlay } from "react-icons/fa";
 
 const Index = () => {
   const [notes, setNotes] = useState([]);
   const [image, setImage] = useState(null);
+  const [imageURL, setImageURL] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -17,11 +18,12 @@ const Index = () => {
 
   const handleAddNote = () => {
     if (title && content) {
-      const newNote = { id: Date.now(), title, content, image, audioURL };
+      const newNote = { id: Date.now(), title, content, image: image || imageURL, audioURL };
       setNotes([...notes, newNote]);
       setTitle("");
       setContent("");
       setImage(null);
+      setImageURL("");
       setAudioURL(null);
     }
   };
@@ -31,18 +33,20 @@ const Index = () => {
     setTitle(noteToEdit.title);
     setContent(noteToEdit.content);
     setImage(noteToEdit.image);
+    setImageURL(noteToEdit.image);
     setAudioURL(noteToEdit.audioURL);
     setIsEditing(true);
     setCurrentNoteId(id);
   };
 
   const handleUpdateNote = () => {
-    setNotes(notes.map((note) => (note.id === currentNoteId ? { ...note, title, content, image, audioURL } : note)));
+    setNotes(notes.map((note) => (note.id === currentNoteId ? { ...note, title, content, image: image || imageURL, audioURL } : note)));
     setTitle("");
     setContent("");
     setIsEditing(false);
     setCurrentNoteId(null);
     setImage(null);
+    setImageURL("");
     setAudioURL(null);
   };
 
@@ -71,6 +75,7 @@ const Index = () => {
     setTitle(note.title);
     setContent(note.content);
     setImage(note.image);
+    setImageURL(note.image);
     setAudioURL(note.audioURL);
     onClose();
   };
@@ -112,6 +117,11 @@ const Index = () => {
           type="file"
           accept="image/*"
           onChange={(e) => setImage(URL.createObjectURL(e.target.files[0]))}
+        />
+        <Input
+          placeholder="Image URL"
+          value={imageURL}
+          onChange={(e) => setImageURL(e.target.value)}
         />
         <Textarea
           placeholder="Content"
