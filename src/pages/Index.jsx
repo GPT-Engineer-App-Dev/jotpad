@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, SimpleGrid, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure, Image } from "@chakra-ui/react";
+import { Box, Container, VStack, HStack, Text, Input, Textarea, Button, IconButton, SimpleGrid, Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure, Image, Flex, Stack } from "@chakra-ui/react";
 import { FaTrash, FaEdit, FaMicrophone, FaPlay } from "react-icons/fa";
 
 const Index = () => {
@@ -82,11 +82,11 @@ const Index = () => {
 
   return (
     <Container maxW="container.xl" p={4}>
-      <Box as="nav" bg="blue.500" color="white" p={4} mb={4}>
-        <HStack justifyContent="space-between">
+      <Box as="nav" bg="teal.500" color="white" p={4} mb={4} borderRadius="md" boxShadow="md">
+        <Flex justifyContent="space-between" alignItems="center">
           <Text fontSize="2xl" fontWeight="bold">Note Taking App</Text>
-          <Button colorScheme="blue" onClick={onOpen}>Past Notes</Button>
-        </HStack>
+          <Button colorScheme="teal" onClick={onOpen}>Past Notes</Button>
+        </Flex>
       </Box>
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay>
@@ -96,7 +96,7 @@ const Index = () => {
             <DrawerBody>
               <VStack align="stretch">
                 {notes.map((note) => (
-                  <Box key={note.id} p={2} borderWidth="1px" borderRadius="md" onClick={() => handleSelectNote(note)} cursor="pointer">
+                  <Box key={note.id} p={2} borderWidth="1px" borderRadius="md" onClick={() => handleSelectNote(note)} cursor="pointer" _hover={{ bg: "gray.100" }}>
                     <Text fontSize="lg" fontWeight="bold">{note.title}</Text>
                     <Text isTruncated>{note.content}</Text>
                   </Box>
@@ -112,40 +112,52 @@ const Index = () => {
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          bg="white"
+          borderRadius="md"
+          boxShadow="sm"
         />
         <Input
           type="file"
           accept="image/*"
           onChange={(e) => setImage(URL.createObjectURL(e.target.files[0]))}
+          bg="white"
+          borderRadius="md"
+          boxShadow="sm"
         />
         <Input
           placeholder="Image URL"
           value={imageURL}
           onChange={(e) => setImageURL(e.target.value)}
+          bg="white"
+          borderRadius="md"
+          boxShadow="sm"
         />
         <Textarea
           placeholder="Content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          bg="white"
+          borderRadius="md"
+          boxShadow="sm"
         />
         <HStack>
           {isRecording ? (
             <Button colorScheme="red" onClick={handleStopRecording}>Stop Recording</Button>
           ) : (
-            <Button leftIcon={<FaMicrophone />} colorScheme="blue" onClick={handleStartRecording}>Record Voice Note</Button>
+            <Button leftIcon={<FaMicrophone />} colorScheme="teal" onClick={handleStartRecording}>Record Voice Note</Button>
           )}
           {audioURL && <Button leftIcon={<FaPlay />} onClick={() => new Audio(audioURL).play()}>Play Voice Note</Button>}
         </HStack>
         {isEditing ? (
-          <Button colorScheme="blue" onClick={handleUpdateNote}>Update Note</Button>
+          <Button colorScheme="teal" onClick={handleUpdateNote}>Update Note</Button>
         ) : (
-          <Button colorScheme="blue" onClick={handleAddNote}>Add Note</Button>
+          <Button colorScheme="teal" onClick={handleAddNote}>Add Note</Button>
         )}
       </VStack>
       <SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} spacing={4}>
         {notes.map((note) => (
-          <Box key={note.id} p={4} borderWidth="1px" borderRadius="md" boxShadow="md">
-            <HStack justifyContent="space-between" mb={2}>
+          <Box key={note.id} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" bg="white" _hover={{ boxShadow: "lg" }}>
+            <Flex justifyContent="space-between" mb={2}>
               <Text fontSize="xl" fontWeight="bold">{note.title}</Text>
               <HStack>
                 <IconButton
@@ -161,9 +173,9 @@ const Index = () => {
                   onClick={() => handleDeleteNote(note.id)}
                 />
               </HStack>
-            </HStack>
+            </Flex>
             <Text>{note.content}</Text>
-            {note.image && <Image src={note.image} alt={note.title} mt={2} />}
+            {note.image && <Image src={note.image} alt={note.title} mt={2} borderRadius="md" />}
             {note.audioURL && <Button leftIcon={<FaPlay />} onClick={() => new Audio(note.audioURL).play()}>Play Voice Note</Button>}
           </Box>
         ))}
